@@ -1,6 +1,6 @@
 {
-  "name": "com.ruteso.squarepay",
-  "productName": "SquarePay",
+  "name": "rakumi",
+  "productName": "Rakumi",
   "main": "main.js",
   "version": "0.1.0",
   "private": true,
@@ -14,7 +14,8 @@
     "react-icons": "''4.10.1",
     "react-router-dom": "''6.14.2",
     "react-scripts": "5.0.1",
-    "socket.io-client": "''4.7.2"
+    "socket.io-client": "''4.7.2",
+    "zustand": "^5.0.6"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -22,8 +23,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": " concurrently -k \"cross-env BROWSER=none npm start\" \"npm electron:start\"",
+    "electron": "npx electronmon .",
     "electron:start": "wait-on tcp:3000 && electron",
-    "electron": "code . & npx electronmon .",
     "watch": "webpack --config webpack.common.js --watch"
   },
   "author": "Peterven",

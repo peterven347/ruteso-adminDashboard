@@ -1,98 +1,74 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Chart } from "chart.js/auto";
-import { Link } from 'react-router-dom'
-import { io } from 'socket.io-client';
-import { FaCoins } from 'react-icons/fa';
-import { PiMoney } from 'react-icons/pi';
+import { FaCoins, FaMedal } from 'react-icons/fa';
 import { PiUsersThreeFill } from "react-icons/pi"
 import { RiShoppingCartFill } from "react-icons/ri"
-import { TbMapPinCheck } from 'react-icons/tb'
+import { useNavigate } from 'react-router-dom';
+import { getData } from "../utils/https";
+import { useAuth, useDashboard, useProduct } from "../store/useStore";
 
-import { Context } from "../App"
-
-// const socket = io("http://localhost:27017")
-
-// socket.emit("event", { val: 33 })
+const START_YEAR = 2020
 
 export default function Dashboard({ setToggle }) {
-    const { url } = useContext(Context)
-    const [counts, setCounts] = useState({ noOfFoodItems: '', noOfCustomers: '' })
+    const navigate = useNavigate()
+    const { counts, monthData, percentData } = useDashboard()
+    const { auth } = useAuth()
+    const { products } = useProduct()
+    const [year, setYear] = useState(new Date().getFullYear())
+    const [month, setMonth] = useState(new Date().toLocaleString("default", { month: "short" }))
+    const temp_months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"]
+    const months = year == new Date().getFullYear() ? temp_months.slice(0, temp_months.indexOf(new Date().toLocaleString("default", { month: "short" })) + 1) : temp_months
+    let noOfDays = year == new Date().getFullYear() && month == new Date().toLocaleString("default", { month: "short" }) ?
+        new Date().getDate() : new Date(+year, months.indexOf(month) + 1, 0).getDate()
+
+    const getYear = (event) => {
+        setYear(event.target.value)
+        if (event.target.value == new Date().getFullYear() && months.indexOf(month) > months.indexOf(new Date().toLocaleString("default", { month: "short" }))) {
+            setMonth(new Date().toLocaleString("default", { month: "short" }))
+        }
+        getData(event.target.value, month)
+    }
+    const getMonth = (event) => {
+        setMonth(event.target.value)
+        getData(year, event.target.value)
+    }
+
     useEffect(() => {
         setToggle(true)
-
-        const loadCounts = async () => {
-            try {
-                const c = await fetch(`${url}/admin/count`)
-                const count = await c.json()
-                setCounts(count)
-                console.log(counts)
-            } catch (err) {
-                document.write("cant load counts")
-            }
+        if (!auth) {
+            setTimeout(() => (
+                navigate("/login")
+            ), 300)
+            return
         }
-        // loadCounts()
+    }, [auth]);
 
+    useEffect(() => {
         var chart
         (async function () {
-            const dataa = [
-                { year: 2010, count: 10 },
-                { year: 2011, count: 20 },
-                { year: 2012, count: 15 },
-                { year: 2013, count: 25 },
-                { year: 2014, count: 22 },
-                { year: 2015, count: 30 },
-                { year: 2016, count: 28 },
-            ];
-
             chart = new Chart(
                 document.getElementById('ctx'),
                 {
-                    // type: 'line',
-                    // data: {
-                    //   datasets: [
-                    //     {
-                    //       label: 'Acquisitions by year',
-                    //       data: data.map(row => row.count)
-                    //     }
-                    //   ]
-                    //   labels: data.map(row => row.year),
-                    // }
                     data: {
                         datasets: [
                             {
-                                type: 'line',
-                                label: 'Orders',
-                                data: [10, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80]
-                            },
-                            {
                                 type: 'bar',
                                 label: 'Customers',
-                                color: "black",
-                                data: [20, 10, 20, 70, 50, 80, 4, 33, 9, 16, 70, 50, 80, 80, 4, 33, 9, 16, 70, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80, 20, 70, 50, 80, 4, 33, 9, 16, 20, 30, 40, 20, 70, 50, 80],
+                                data: Array.from({ length: noOfDays }, (_, i) => monthData[i + 1]?.totalCustomers || 0),
+                            },
+                            {
+                                type: 'line',
+                                label: 'Orders',
+                                data: Array.from({ length: 31 }, (_, i) => monthData[i + 1]?.totalOrders || 0),
                             }
                         ],
-                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                        labels: Array.from({ length: noOfDays }, (_, i) => i + 1)
                     }
                 }
             )
         })();
         return () => { chart.destroy() }
-    }, [])
-
-    const [datadel, setdatadel] = useState("Worked!")
-    const options = {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-    };
-    const [date, setDate] = useState(new Date().toLocaleString('en-US', options) + ".")
-
-    // const read = () => {
-    //     socket.emit("hello", "Yeah!", (response) => {
-    //         setdatadel(response);
-    //     })
-    // }
+    }, [monthData])
 
     function Card(props) {
         return (
@@ -105,60 +81,76 @@ export default function Dashboard({ setToggle }) {
             </div>
         )
     }
-    const li = [{ n: "iuytrer" }, { n: "lkjhgfdsd" }]
+
     function PlateCard(props) {
         return (
-            <div style={styles.plateCard}>
-                <p style={styles.plateCard_p}>{props.title}</p>
+            <div style={{ ...styles.plateCard, ...props.styles }}>
+                <p style={styles.plateCard_title}>{props.title}</p>
                 <hr />
-                <ul style={{ listStyleType: "square", marginLeft: 22 }}>
-                    {props.children?.map((i, index) => (
-                        <li key={index}>{i}</li>
-                    ))}
-                </ul>
+                <div style={styles.plateCardScroll}>
+                    <ul style={{ listStyleType: "square", marginLeft: 22 }}>
+                        {props.children?.map((i, index) => (
+                            <li key={index} style={{ fontWeight: 600 }}>{i}</li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         )
     }
 
     return (
-        <div style={{ marginLeft: 234, marginRight: 6, marginTop: 40, overflow: "hidden" }}>
-            <div style={{ display: "flex" }}>
-                {/* <button onClick={() => { read() }}>click</button> */}
-                <div style={styles.cardscontainer}>
-                    <div style={{ display: "flex" }}>
-                        <Card cardtext="Customers" cardtextval={counts.noOfCustomers} icon={<PiUsersThreeFill size={46} />} bg="orange" />
-                        <Card cardtext="Total Items" cardtextval={counts.noOfFoodItems} icon={<RiShoppingCartFill size={46} />} bg="blue" />
+        <>
+            <div style={{ marginLeft: 234, marginRight: 6, marginTop: 40, overflow: "hidden" }}>
+                <div style={{ display: "flex", userSelect: "none" }}>
+                    <div style={styles.cardscontainer}>
+                        <div style={{ width: "100%", display: "flex", paddingInline: 10, justifyContent: "space-between" }}>
+                            <p style={{ fontWeight: "bold", color: "rgb(18, 18, 25)" }}>Total Customers: {counts.noOfCustomers}</p>
+                            {/* <p style={{ color: "rgb(18, 18, 25)" }}>failed delivery: <span style={{ color: true ? "#000" : "#f00" }}>{0}</span></p> */}
+                        </div>
+                        <p style={{ marginLeft: 10 }}>{'\u00A0'}</p>
+                        <div style={{ display: "flex" }}>
+                            <Card cardtext="Active Customers" cardtextval={counts.noOfActiveCustomers} icon={<PiUsersThreeFill size={46} />} bg="orange" />
+                            <Card cardtext="Items" cardtextval={counts.noOfFoodItems} icon={<RiShoppingCartFill size={46} />} bg="blue" />
+                        </div>
+                        <div style={{ display: "flex" }}>
+                            <Card cardtext="Revenue" cardtextval={`₦${counts.revenue}`} icon={<FaCoins size={46} />} bg="lime" />
+                            <Card cardtext="Month Score" cardtextval="15%" icon={<FaMedal size={46} />} bg="coral" />
+                        </div>
+                        <p style={{ marginLeft: 10 }}>{'\u00A0'}</p>
                     </div>
-                    <div style={{ display: "flex" }}>
-                        <Card cardtext="Revenue" cardtextval="₦566,000" icon={<FaCoins color="white" size={46} />} bg="lime" />
-                        <Card cardtext="Regions" cardtextval="5" icon={<TbMapPinCheck size={46} />} bg="coral" />
+                    <hr />
+                    <div style={{ backgroundColor: "#fefefe", color: "rgb(18, 18, 25)" }}>
+                        <select id="month" value={month} onChange={getMonth} style={{ outline: "none", boxShadow: "none" }}>
+                            <option value={month}>{month}</option>
+                            {months?.filter(i => i !== month).map((i) =>
+                                <option key={i} value={i}>{i}</option>
+                            )}
+                        </select>
+                        <select id="year" value={year} onChange={getYear} style={{ outline: "none" }}>
+                            {Array.from({ length: new Date().getFullYear() + 1 - START_YEAR }, (_, i) => i - (new Date().getFullYear() - START_YEAR)).map((i) =>
+                                <option key={i} value={(new Date().getFullYear() + i).toString()}>{(new Date().getFullYear() + i).toString()}</option>
+                            )}
+                        </select>
                     </div>
-                    <div style={{ minWidth: "100%" }}>
-                        <p style={{ marginLeft: 10, fontWeight: "bold" }}>Today :</p>
-                        <p style={{ marginLeft: 10 }}>Total Customers' order: 700</p>
-                        <p style={{ marginLeft: 10 }}>Total Order Expense: 28,000</p>
-                        <p style={{ marginLeft: 10 }}>Total Order Income: 18,000</p>
+                    <div>
+                        <div style={styles.graph}>
+                            <canvas id="ctx"></canvas>
+                        </div>
                     </div>
                 </div>
-                <hr />
-                <div>
-                    <div style={styles.graph}>
-                        <canvas id="ctx" style={{}}></canvas>
+                <div style={{ width: "100%", marginTop: 8, backgroundColor: "#fff" }}>
+                    <p>{'\u00A0'}</p>
+                    <div style={{ height: "auto", display: "flex", justifyContent: "space-evenly" }}>
+                        <PlateCard title="Top Earners" children={percentData.map(i => i.percent > 75 && `${i.name} ${i.percent}%`).filter(Boolean)} />
+                        <PlateCard title="SLOB" children={percentData.map(i => i.percent < 45 && `${i.name} ${i.percent}%`).filter(Boolean)} />
+                        <PlateCard title="About to Expire" children={products
+                            .filter(i => new Date(i.exp_date).getTime() < new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)))
+                            .map(i => `${i.name} (${Math.round((new Date(i.exp_date).getTime() - Date.now()) / (24 * 60 * 60 * 1000))} days)`)} styles={{ width: 338 }} />
+                        <PlateCard title="Customers' Feedback" children={["User 1", "User 2", "User 3"]} styles={{ width: 384 }} />
                     </div>
                 </div>
             </div>
-            <div style={{ width: "100%", marginTop: 4, backgroundColor: "#fff" }}>
-                <p>#######</p>
-                <hr style={{ marginTop: 4, marginBottom: 4 }} />
-                <div style={{ height: "auto", display: "flex", justifyContent: "space-evenly" }}>
-                    <PlateCard title="Top Earners" children={["Item 1", "Item 2", "Item 3"]} />
-                    <PlateCard title="Promotions" children={["Company 1", "Company 2", "Company 3"]} />
-                    <PlateCard title="Selected Reviews" children={["User 1", "User 2", "User 3"]} />
-                    <PlateCard title="About to Expire" children={["Item 1", "Item 2", "Item 3"]} />
-                </div>
-                <div style={{ height: 4 }}></div>
-            </div>
-        </div>
+        </>
     )
 }
 
@@ -175,36 +167,44 @@ const styles = {
         color: "#fff",
     },
     cardscontainer: {
+        width: "50%",
+        whiteSpace: "wrap",
         padding: 8,
         display: "flex",
         flexWrap: "wrap",
-        backgroundColor: "#fff"
+        backgroundColor: "#fff",
+        alignItems: " flex-start",
     },
     graph: {
-        width: 602,
-        height: "100%",
-        // overFlow: "auto",
-        // overFlowX: "auto",
-        overflowX: "auto",
+        width: 708,
+        color: "rgb(18, 18, 25)",
         backgroundColor: "#fff",
     },
     plateCard: {
-        minWidth: 250,
-        height: 300,
+        minWidth: 228,
+        height: 294,
         marginLeft: 8,
         marginRight: 8,
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
+        marginBottom: 8,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
         borderBottomLeftRadius: 6,
         borderBottomRightRadius: 6,
-        backgroundColor: "purple",
+        backgroundColor: "rgba(35, 35, 45, 1)",
     },
-    plateCard_p: {
+    plateCardScroll: {
+        color: "rgb(230, 230, 230)",
+        marginTop: 8,
+        height: "80%",
+        overflowY: "auto"
+    },
+    plateCard_title: {
         margin: 8,
+        color: "rgb(240, 240, 240)",
         fontWeight: "bold",
         whiteSpace: "nowrap",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
     }
 }

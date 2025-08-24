@@ -12,18 +12,28 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: lightgrey;
-  /* transition: red 5s; */
-  /* overflow-y: hidden; */
   scroll-behavior: smooth;
-}
-
-tbody > tr:hover {
-  color: white;
-  background-color:  rgba(18, 18, 25, 0.9);
-  user-select: none;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background:  rgba(36, 36, 50, 0.9);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f1f1f1;
+}
+
+li::marker {
+  color: rgb(250, 250, 250);
+  /* color: rgb(18, 18, 25); */
 }

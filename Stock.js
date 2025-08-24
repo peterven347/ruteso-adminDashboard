@@ -49,16 +49,9 @@ export default function Stock() {
         fetchUnavailable(setUnavailable)
     }, [])
 
-    // useEffect(() => {
-    //     setDataX(products)
-    // }, [products])
     useEffect(() => {
-        if (dataTitle === 0) {
-            setDataX(products)
-        } else {
-            setDataX(unavailable)
-        }
-    }, [products, unavailable])
+        setDataX(products)
+    }, [products])
 
     function DelModal() {
         return (
@@ -73,8 +66,7 @@ export default function Stock() {
                         </p>
                         <div style={styles.confirmDiv}>
                             <input style={styles.button} type="button" value="CANCEL" onClick={() => { setOverlayVisible(false); setOvelayDiv(false) }} />
-                            <input style={{ ...styles.button, backgroundColor: overlayDiv === "remove" ? "#f00" : "#0f0" }} type="button" value="CONFIRM"
-                                onClick={() => { overlayDiv === "remove" ? delData(currVal, setUnavailable, setOvelayDiv) : restoreData(currVal, setUnavailable, setOvelayDiv) }} />
+                            <input style={{ ...styles.button, backgroundColor: overlayDiv === "remove" ? "#f00" : "#0f0" }} type="button" value="CONFIRM" onClick={() => { overlayDiv === "remove" ? delData(currVal, setUnavailable, setOvelayDiv) : restoreData(currVal, setUnavailable, setOvelayDiv) }} />
                         </div>
                     </div >
                 }
@@ -183,10 +175,11 @@ export default function Stock() {
                     </tbody>
                 </table>
                 <AddNewItem currVal={currVal} setCurrVal={setCurrVal} setDataTitle={setDataTitle} newItem={newItem} setNewItem={setNewItem} categories={categories} />
-                <NewStock currVal={currVal} setCurrVal={setCurrVal} setDataTitle={setDataTitle} newStock={newStock} setNewStock={setNewStock} />
+                <NewStock currVal={currVal} setCurrVal={setCurrVal} setDataTitle={setDataTitle} newStock={newStock} setNewStock={setNewStock}/>
             </div>
             <DelModal />
         </>
+
     )
 }
 
@@ -223,6 +216,8 @@ const styles = {
         height: 26,
         marginTop: 34,
         display: "flex",
+        // justifyContent: "space-betwwen",
+        // alignItems: "center",
         position: "fixed",
         backgroundColor: "#78759f",
         zIndex: 4
@@ -252,6 +247,7 @@ const styles = {
         backgroundColor: "lightgrey",
         fontSize: 14,
         fontWeight: 700,
+        // height: "100%",
         marginLeft: 20,
         outline: "none",
         border: "none",

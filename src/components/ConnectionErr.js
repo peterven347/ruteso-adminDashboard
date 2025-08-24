@@ -4,7 +4,7 @@ import React from "react"
 export default function connectionErr(){
     return(
         <div style={styles.errNav}>
-            <p>CONNECTION ERROR!</p>
+            <p style={{wordSpacing: 4}}>CONNECT TO INTERNET!</p>
         </div>
     )
 }
@@ -21,7 +21,7 @@ const styles = {
         backgroundColor: "rgba(255, 0, 0, 0.2)",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 100,
-        marginBottom: 67
+        zIndex: 8,
+        marginBottom: 72
     }
 }

@@ -1,5 +1,4 @@
-import React, {useEffect} from "react";
-import openSocket from 'socket.io-client';
+import React, {} from "react";
 
 export default function Stats(){
 
